@@ -1,12 +1,34 @@
-# name: CI Pipeline
+name: CI Pipeline
 
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: create static deployment file
+        run: |
+          mkdir dist
+          echo "<h1>Hello Github pages</h1>" >> dist/index.html
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - run: echo "Hello GitHub Actions"
+      - name: Update pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-page@v4
