@@ -23,7 +23,7 @@ jobs:
       - name: set version
         id: set_version
         run: |
-          version=$(date + '%Y%m%d.%H%M%S')
+          version=$(date +'%Y%m%d.%H%M%S')
           echo "version=$version" >> "$GITHUB_OUTPUT"
           printf '{"version": "%s"}' "$version" > public/version.json
 
