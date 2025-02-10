@@ -12,8 +12,8 @@ test( "login and order pizza", async ( { page } ) => {
     await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
     await page.getByRole('textbox', { name: 'Password' }).fill('admin');
     await page.getByRole('textbox', { name: 'Password' }).press('Enter');
-    await page.getByRole('button', { name: 'Login' }).click();
     await page.getByRole('link', { name: 'Order' }).click();
+    await expect( page.url() ).toEqual( "http://localhost:5173/menu" );
     await page.getByRole('link', { name: "Pepperoni"}).click();
     await page.getByRole('link', { name: "Margarita"}).click();
 });
