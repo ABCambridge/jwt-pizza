@@ -1,6 +1,19 @@
 import { test, expect } from 'playwright-test-coverage';
 
-test( "home page", async ({ page }) => {
+test.describe.configure({mode: 'serial'});
+
+/** @type {import('@playwright/test').Page} */
+let page; // to be the the page used by this file's tests
+
+test.beforeAll( async ( { browser } ) => {
+  page = await browser.newPage();
+} );
+
+test.afterAll( async () => {
+  await page.close();
+})
+
+test( "home page", async () => {
   await page.goto('/');
   expect(await page.title()).toBe('JWT Pizza');
   await expect( page.getByRole("button", { name: "Order now" } )).toBeVisible();
@@ -8,7 +21,7 @@ test( "home page", async ({ page }) => {
   expect( page.url() ).toEqual( "http://localhost:5173/menu" );
 });
 
-test( "login and order pizza", async ( { page } ) => {
+test( "login and order pizza", async () => {
     await page.goto('http://localhost:5173/');
 
     // Login
@@ -69,13 +82,14 @@ test( "login and order pizza", async ( { page } ) => {
     await page.getByRole('button', { name: 'Close' }).click();
 
     await page.getByRole('link', { name: "Logout" } ).click();
+    await expect( page.getByRole('link', { name: 'login' } ) ).toBeVisible()
 });
 
 function randomName() {
   return Math.random().toString(36).substring(2, 12);
 }
 
-test( "no auth pages", async ( { page } ) => {
+test( "no auth pages", async () => {
   await page.goto('http://localhost:5173/');
 
   // view franchise page of non-franchise-owner
@@ -109,5 +123,30 @@ test( "no auth pages", async ( { page } ) => {
   await expect(page.getByRole('main').getByText('Register')).toBeVisible();
 
   // go to non existent page
-  // await page.goto( "http://locatlhost:5173/bad-page")
+  await page.goto( "http://localhost:5173/404");
+  await expect(page.getByText('Oops')).toBeVisible();
+  await expect(page.getByRole('link', { name: '404' })).toBeVisible();
+  await expect(page.getByText('It looks like we have dropped')).toBeVisible();
+
+  // Register and place an order
+  await expect(page.getByRole('link', { name: 'Register' })).toBeVisible();
+  await page.getByRole('link', { name: 'Register' }).click();
+  await page.getByRole('textbox', { name: 'Full name' }).click();
+  await page.getByRole('textbox', { name: 'Full name' }).fill(randomName());
+  await page.getByRole('textbox', { name: 'Full name' }).press('Tab');
+  await page.getByRole('textbox', { name: 'Email address' }).fill('rand@jwt.com');
+  await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
+  await page.getByRole('textbox', { name: 'Password' }).fill(randomName());
+  await page.getByRole('button', { name: 'Register' }).click();
+  await new Promise(resolve => setTimeout(resolve, 500));
+  await page.getByRole('link', { name: 'Order' }).click();
+  await new Promise(resolve => setTimeout(resolve, 500));
+  await page.getByRole('link', { name: 'Image Description Pepperoni' }).click();
+  await page.getByRole('combobox').selectOption('1');
+  await page.getByRole('button', { name: 'Checkout' }).click();
+  await expect(page.getByRole('button', { name: 'Pay now' })).toBeVisible();
+  await page.getByRole('button', { name: 'Pay now' }).click();
+  await expect(page.getByRole('button', { name: 'Verify' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Order more' })).toBeVisible();
+  await expect(page.getByText('Here is your JWT Pizza!')).toBeVisible();
 } );
