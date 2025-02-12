@@ -81,3 +81,50 @@ export async function mockFranchiseGet( currentPage ) {
     } );
 }
 
+export async function mockOrderPost( currentPage ) {
+    /** @type {import('@playwright/test').Page} */
+    let page = currentPage;
+
+    await page.route('*/**/api/order', async ( route ) => {
+        expect( route.request().method() ).toBe( 'POST' );
+        const orderRequest = {
+            "items": [
+              {
+                "menuId": 2,
+                "description": "Pepperoni",
+                "price": 0.0042
+              }
+            ],
+            "storeId": "1",
+            "franchiseId": 1
+          };
+
+        expect( route.request().postDataJSON() ).toMatchObject( orderRequest );
+        const orderResponse = {
+            "order": {
+              "items": [
+                {
+                  "menuId": 2,
+                  "description": "Pepperoni",
+                  "price": 0.0042
+                }
+              ],
+              "storeId": "1",
+              "franchiseId": 1,
+              "id": 158
+            },
+            "jwt": "eyJpYXQiOjE3MzkzODU0NTAsImV4cCI6MTczOTQ3MTg1MCwiaXNzIjoiY3MzMjkuY2xpY2siLCJhbGciOiJSUzI1NiIsImtpZCI6IjE0bk5YT21jaWt6emlWZWNIcWE1UmMzOENPM1BVSmJuT2MzazJJdEtDZlEifQ.eyJ2ZW5kb3IiOnsiaWQiOiJhY2FtYnJpZCIsIm5hbWUiOiJBbmRyZXcgQ2FtYnJpZGdlIn0sImRpbmVyIjp7ImlkIjo4MiwibmFtZSI6Im96ajI1cjRtaWoiLCJlbWFpbCI6InJhbmRAand0LmNvbSJ9LCJvcmRlciI6eyJpdGVtcyI6W3sibWVudUlkIjoyLCJkZXNjcmlwdGlvbiI6IlBlcHBlcm9uaSIsInByaWNlIjowLjAwNDJ9XSwic3RvcmVJZCI6IjEiLCJmcmFuY2hpc2VJZCI6MSwiaWQiOjE1OH19.qOo6H_fXv1fLM_lnP6uqjPqApmbooiy_NGxK7Fz8-UWSU5M4iYNW0ijb8KaEN2e3nF4Z1GvU1oi9pQFArF-QhLIAiZy5PZdfWG8dgpkwMlGx4D2inRy5ENCVcSQm7bFkDQABuVT2Bma-G7sAi9mOQhQaduhGE-MHvWKMeXHh62z9Neb6dQfZDsNNxJ4TxCfebJX3l-YjE0TpTZWMPquKmUNw6gcgILZPK816y19BniteQ7l6BmUgLXxc009foSM73Ghu8e5tjecNGK2rryjJ68dsDI_G_Sv-WiSTj6ORmgxMCytibcIqvsadKL-ZlFVAQQducyc-R8-xD2CA8IYMxuu5tSuQRbXnoe39-mhxlBdKguAszI3T113IcgDNDo5RodTVspqbF5O-hVrk5kMH-mmlI-LDZt_wKoSxXsodzaAbgO4VeliUeQ4Cmigm4X9iFktdQ24cdkiM_xZt0CR-9aNUHlwd_AUOU_uTWiWiyIvkZ5xtKQbCML10U40dPdD_0a1bqrqH_D0bzcv9QSfOnOvbIoB46qVA8W0fco2d3fa_PvXy_kiDh1E2hN69TznnivsIXsDZxPCj6UXvCKY4ZZNfN0-_7olWVZpcBgkdcrVuvmF7aSuj_xO91Ag0swEdROFnVLDQwkysGBFrfP10tMRLM_oqIDTJiMlgnpRDVPQ"
+          };
+
+        await route.fulfill({ json: orderResponse });
+    } );
+}
+
+// export async function mockAuthPost( currentPage ) {
+//     /** @type {import('@playwright/test').Page} */
+//     let page = currentPage;
+
+//     await page.route('*/**/api/auth', async ( route ) => {
+//         expect( route.request().me)
+//     });
+// }
