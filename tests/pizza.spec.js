@@ -31,7 +31,10 @@ test( "login", async () => {
   await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
   await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
   await page.getByRole('textbox', { name: 'Password' }).fill('admin');
+
+  const loginResponse = page.waitForResponse( '**/*/api/auth');
   await page.getByRole('textbox', { name: 'Password' }).press('Enter');
+  await loginResponse;
 });
 
 test( "order pizza", async () => {
@@ -71,18 +74,29 @@ test( "rest", async () => {
   await page.getByRole('link', { name: 'Franchise' }).click();
   await page.getByRole('button', { name: 'Create store' }).click();
   await page.getByRole('textbox', { name: 'store name' }).click();
-  const randStore = randomName();
-  await page.getByRole('textbox', { name: 'store name' }).fill( randStore );
+  const randStore1 = randomName();
+  await page.getByRole('textbox', { name: 'store name' }).fill( randStore1 );
   await page.getByRole('button', { name: 'Create' }).click();
 
-  // confirm store is made
-  await expect( page.getByRole('cell', { name: randStore }) ).toBeVisible()
-  // close store
-  await page.getByRole('row', { name: `${randStore} 0 ₿ Close` }).getByRole('button').click();
+  // create a second store
+  await page.getByRole('button', { name: 'Create store' }).click();
+  await page.getByRole('textbox', { name: 'store name' }).click();
+  const randStore2 = randomName();
+  await page.getByRole('textbox', { name: 'store name' }).fill( randStore2 );
+  await page.getByRole('button', { name: 'Create' }).click();
+
+  // confirm stores are made
+  await expect( page.getByRole('cell', { name: randStore1 }) ).toBeVisible()
+  await expect( page.getByRole('cell', { name: randStore2 }) ).toBeVisible()
+  // close a store
+  await page.getByRole('row', { name: `${randStore1} 0 ₿ Close` }).getByRole('button').click();
   await page.getByRole('button', { name: 'Close' }).click();
+
+  // close the franchise
   await page.getByRole('link', { name: 'Admin' }).click();
-  await page.getByRole('row', { name: `${randFranchise} 常用名字 Close` }).getByRole('button').click();
-  await page.getByRole('button', { name: 'Close' }).click();
+  await expect(page.getByRole('button', {name: 'Close'}).nth(1)).toBeVisible();
+  await page.getByRole('button', { name: 'Close' }).nth(1).click();
+  // await page.getByRole('button', { name: 'Close' }).click();
 
   await page.getByRole('link', { name: "Logout" } ).click();
   await expect( page.getByRole('link', { name: 'login' } ) ).toBeVisible()
