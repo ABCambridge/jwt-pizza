@@ -28,6 +28,7 @@ test( "home page", async () => {
 test( "login", async () => {
   // Login
   await page.getByRole('link', { name: 'Login' }).click();
+  await expect(page.getByRole('textbox', { name: 'Email address' })).toBeVisible()
   await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
   await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
   await page.getByRole('textbox', { name: 'Password' }).fill('admin');
@@ -56,7 +57,7 @@ test( "order pizza", async () => {
     await page.getByRole('button', { name: 'Order more' }).click();
 });
 
-test( "rest", async () => {
+test( "create franchise and stores", async () => {
 
   // create a franchise
   await page.getByRole('link', { name: 'Admin' }).click();
