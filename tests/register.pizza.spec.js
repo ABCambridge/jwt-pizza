@@ -1,23 +1,10 @@
 import { test, expect } from 'playwright-test-coverage';
 
-test.describe.configure({mode: 'serial'});
-
-/** @type {import('@playwright/test').Page} */
-let page; // to be the the page used by this file's tests
-
-test.beforeAll( async ( { browser } ) => {
-  page = await browser.newPage();
-} );
-
-test.afterAll( async () => {
-  await page.close();
-})
-
 function randomName() {
     return Math.random().toString(36).substring(2, 12);
 }
 
-test( "register", async () => {  
+test( "register and order", async ( { page } ) => {  
   await page.goto('/');
 
   // Register and place an order
@@ -34,9 +21,7 @@ test( "register", async () => {
   const registerPromise = page.waitForResponse('**/*/api/auth');
   await page.getByRole('button', { name: 'Register' }).click();
   await registerPromise;
-} );
 
-test( "order", async () => {
   await expect(page.getByRole('link', {name: 'Order'})).toBeVisible()
   await page.getByRole('link', { name: 'Order' }).click();
   await page.getByRole('link', { name: 'Image Description Pepperoni' }).click();
