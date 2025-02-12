@@ -39,28 +39,30 @@ test( "login", async () => {
 });
 
 test( "order pizza", async () => {
-    // Order pizzas
-    await expect(page.getByRole('link', { name: 'Order' })).toBeVisible();
-    await page.getByRole('link', { name: 'Order' }).click();
-    await expect(page.getByText('Awesome is a click away')).toBeVisible();
-    await expect(page.getByText('What are you waiting for?')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Image Description Pepperoni' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Image Description Margarita' })).toBeVisible();
-    await page.getByRole('link', { name: 'Image Description Pepperoni' }).click();
-    await page.getByRole('link', { name: 'Image Description Margarita' }).click();
-    await page.getByRole('combobox').selectOption('1');
-    await page.getByRole('button', { name: 'Checkout' }).click();
-    await page.getByRole('button', { name: 'Pay now' }).click();
-    await page.getByRole('button', { name: 'Verify' }).click();
-    await expect(page.getByRole('button', { name: 'Close' })).toBeVisible();
-    await page.getByRole('button', { name: 'Close' }).click();
-    await page.getByRole('button', { name: 'Order more' }).click();
+  // Order pizzas
+  await expect(page.getByRole('link', { name: 'Order' })).toBeVisible();
+  await page.getByRole('link', { name: 'Order' }).click();
+  await expect(page.getByText('Awesome is a click away')).toBeVisible();
+  await expect(page.getByText('What are you waiting for?')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Image Description Pepperoni' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Image Description Margarita' })).toBeVisible();
+  await page.getByRole('link', { name: 'Image Description Pepperoni' }).click();
+  await page.getByRole('link', { name: 'Image Description Margarita' }).click();
+  await page.getByRole('combobox').selectOption('1');
+  await page.getByRole('button', { name: 'Checkout' }).click();
+  await page.getByRole('button', { name: 'Pay now' }).click();
+  await page.getByRole('button', { name: 'Verify' }).click();
+  await expect(page.getByRole('button', { name: 'Close' })).toBeVisible();
+  await page.getByRole('button', { name: 'Close' }).click();
+  await expect(page.getByRole('button', { name: 'Order more' })).toBeVisible();
 });
 
 test( "create franchise and stores", async () => {
-
+  await page.goto('/');
   // create a franchise
   await page.getByRole('link', { name: 'Admin' }).click();
+  await expect( page.getByRole('button', { name: 'Add Franchise' }) ).toBeVisible();
+  // await expect(page.getByRole('textbox', { name: 'franchise name' })).toBeVisible();
   await page.getByRole('button', { name: 'Add Franchise' }).click();
   await page.getByRole('textbox', { name: 'franchise name' }).click();
   const randFranchise = randomName()
@@ -97,7 +99,7 @@ test( "create franchise and stores", async () => {
   await page.getByRole('link', { name: 'Admin' }).click();
   await expect(page.getByRole('button', {name: 'Close'}).nth(1)).toBeVisible();
   await page.getByRole('button', { name: 'Close' }).nth(1).click();
-  // await page.getByRole('button', { name: 'Close' }).click();
+  await page.getByRole('button', { name: 'Close' }).click();
 
   await page.getByRole('link', { name: "Logout" } ).click();
   await expect( page.getByRole('link', { name: 'login' } ) ).toBeVisible()
