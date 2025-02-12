@@ -1,4 +1,5 @@
 import { test, expect } from 'playwright-test-coverage';
+import { mockFranchiseGet, mockMenuGet } from './test-utils';
 
 function randomName() {
     return Math.random().toString(36).substring(2, 12);
@@ -40,6 +41,8 @@ test( "404 page - no auth", async ( { page } ) => {
 } );
 
 test( "start order - no auth", async ( { page } ) => {
+    await mockMenuGet( page );
+    await mockFranchiseGet( page );
     await page.goto('http://localhost:5173/');
 
     // start on order while not logged in
