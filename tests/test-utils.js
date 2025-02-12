@@ -80,3 +80,4 @@ export async function mockFranchiseGet( currentPage ) {
         await route.fulfill({ json: franchiseResponse })
     } );
 }
+

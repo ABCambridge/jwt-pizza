@@ -1,10 +1,13 @@
 import { test, expect } from 'playwright-test-coverage';
+import { mockMenuGet, mockFranchiseGet } from './test-utils';
 
 function randomName() {
     return Math.random().toString(36).substring(2, 12);
 }
 
 test( "register and order", async ( { page } ) => {  
+  await mockMenuGet( page );
+  await mockFranchiseGet( page );
   await page.goto('/');
 
   // Register and place an order
