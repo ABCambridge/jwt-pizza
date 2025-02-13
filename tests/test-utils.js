@@ -86,6 +86,47 @@ async function mockFranchiseAPICall( currentPage ) {
     } );
 }
 
+async function mockOrderVerificationAPICall( currentPage ) {
+  /** @type {import('@playwright/test').Page} */
+  let page = currentPage;
+  await page.route( '*/**/api/order/verify', async ( route ) => {
+    if( route.request().method() == 'POST' ) {
+      const responseBody = {
+        "message": "valid",
+        "payload": {
+          "vendor": {
+            "id": "acambrid",
+            "name": "Andrew Cambridge"
+          },
+          "diner": {
+            "id": 1,
+            "name": testUserName,
+            "email": testEmail
+          },
+          "order": {
+            "items": [
+              {
+                "menuId": 2,
+                "description": "Pepperoni",
+                "price": 0.0042
+              },
+              {
+                "menuId": 3,
+                "description": "Margarita",
+                "price": 0.0042
+              }
+            ],
+            "storeId": "1",
+            "franchiseId": 1,
+            "id": 169
+          }
+        }
+      }
+      await route.fulfill({ json: responseBody });
+    }
+  } );
+}
+
 async function mockOrderAPICall( currentPage ) {
     /** @type {import('@playwright/test').Page} */
     let page = currentPage;
@@ -131,6 +172,7 @@ async function mockAuthAPICall( currentPage ) {
     let page = currentPage;
 
     await page.route('*/**/api/auth', async ( route ) => {
+        let responseBody;
         if( route.request().method() == 'POST') {
           const requestBody = {
             "name": testUserName,
@@ -138,7 +180,7 @@ async function mockAuthAPICall( currentPage ) {
             "password": testPassword
           };
           expect( route.request().postDataJSON() ).toMatchObject( requestBody );
-          const responseBody = {
+          responseBody = {
             "user": {
               "name": testUserName,
               "email": testEmail,
@@ -151,8 +193,37 @@ async function mockAuthAPICall( currentPage ) {
             },
             "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYnk1dXJqaTNoYyIsImVtYWlsIjoicmFuZEBqd3QuY29tIiwicm9sZXMiOlt7InJvbGUiOiJkaW5lciJ9XSwiaWQiOjkyLCJpYXQiOjE3Mzk0MDc2MTd9.4vTJOS-7eQaF4anv6Uu-7qqMv-jyI_AQlYH-sAeghgE"
           };
-          await route.fulfill({ json: responseBody });
         }
+        else if( route.request().method() == 'PUT' ) {
+          const requestBody = {
+            "email": testEmail,
+            "password": testPassword
+          };
+          expect( route.request().postDataJSON() ).toMatchObject( requestBody );
+          responseBody = {
+            "user": {
+              "id": 1,
+              "name": testUserName,
+              "email": testEmail,
+              "roles": [
+                {
+                  "role": "admin"
+                },
+                {
+                  "objectId": 76,
+                  "role": "franchisee"
+                }
+              ]
+            },
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IuW4uOeUqOWQjeWtlyIsImVtYWlsIjoiYUBqd3QuY29tIiwicm9sZXMiOlt7InJvbGUiOiJhZG1pbiJ9LHsib2JqZWN0SWQiOjc2LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjc3LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjc4LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjc5LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjgwLCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjgyLCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjg0LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjg1LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjg2LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjg3LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjkwLCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjkxLCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjkyLCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjkzLCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjk0LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjk1LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjk2LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjk3LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjk4LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjk5LCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjEwMCwicm9sZSI6ImZyYW5jaGlzZWUifSx7Im9iamVjdElkIjoxMDEsInJvbGUiOiJmcmFuY2hpc2VlIn0seyJvYmplY3RJZCI6MTAyLCJyb2xlIjoiZnJhbmNoaXNlZSJ9LHsib2JqZWN0SWQiOjEwMywicm9sZSI6ImZyYW5jaGlzZWUifSx7Im9iamVjdElkIjoxMDQsInJvbGUiOiJmcmFuY2hpc2VlIn1dLCJpYXQiOjE3Mzk0MDk1MzF9.n2mNP6_1taZCume1XqH_KoBePFXY8DV4oPXhgUtO5nI"
+          }
+        }
+        else if ( route.request().method() == 'DELETE' ) {
+          responseBody = {
+            "message": "logout successful"
+          }
+        }
+        await route.fulfill({ json: responseBody });
     });
 }
 
@@ -163,5 +234,6 @@ export {
   mockMenuGet,
   mockFranchiseAPICall,
   mockOrderAPICall,
-  mockAuthAPICall
+  mockAuthAPICall,
+  mockOrderVerificationAPICall  
 };
