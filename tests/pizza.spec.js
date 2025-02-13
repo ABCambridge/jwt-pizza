@@ -1,10 +1,6 @@
 import { test, expect } from 'playwright-test-coverage';
 import * as mocks from './test-utils';
 
-function randomName() {
-  return Math.random().toString(36).substring(2, 12);
-}
-
 async function login( page ) {
   await page.goto('/');
   await page.getByRole( 'link', { name: 'Login' } ).click();
