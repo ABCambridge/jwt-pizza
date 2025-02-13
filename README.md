@@ -1,6 +1,6 @@
 # 🍕 JWT Pizza
 
-![Coverage badge](https://badge.cs329.click/badge/ABCambridge/jwtpizzacoverage)
+![Coverage badge](https://badge.cs329.click/badge/ABCambridge/jwtpizzacoverage?hi)
 
 [![CI Pipeline](https://github.com/ABCambridge/jwt-pizza/actions/workflows/ci.yml/badge.svg)](https://github.com/ABCambridge/jwt-pizza/actions/workflows/ci.yml)
 
