@@ -84,19 +84,22 @@ test( "create franchise and stores", async ( { page } ) => {
   await mocks.mockFranchiseAPICall( page );
   await login( page );  
 
-  // create a franchise
-  await page.getByRole('link', { name: 'Admin' }).click();
-  await expect( page.getByRole('button', { name: 'Add Franchise' }) ).toBeVisible();
-  await page.getByRole('button', { name: 'Add Franchise' }).click();
-  await page.getByRole('textbox', { name: 'franchise name' }).click();
-  await page.getByRole('textbox', { name: 'franchise name' }).fill( mocks.testFranchiseName );
-  await page.getByRole('textbox', { name: 'franchisee admin email' }).fill( mocks.testEmail );
-  const createFranchisePromise = page.waitForResponse('**/*/api/franchise');
-  await page.getByRole('button', { name: 'Create' }).click();
-  await createFranchisePromise;
+  async function createFranchise() {
+    // create a franchise
+    await page.getByRole('link', { name: 'Admin' }).click();
+    await expect( page.getByRole('button', { name: 'Add Franchise' }) ).toBeVisible();
+    await page.getByRole('button', { name: 'Add Franchise' }).click();
+    await page.getByRole('textbox', { name: 'franchise name' }).click();
+    await page.getByRole('textbox', { name: 'franchise name' }).fill( mocks.testFranchiseName );
+    await page.getByRole('textbox', { name: 'franchisee admin email' }).fill( mocks.testEmail );
+    const createFranchisePromise = page.waitForResponse('**/*/api/franchise');
+    await page.getByRole('button', { name: 'Create' }).click();
+    await createFranchisePromise;
 
-  // confirm franchise is made
-  await expect( page.getByRole('cell', { name: mocks.testFranchiseName }) ).toBeVisible();
+    // confirm franchise is made
+    await expect( page.getByRole('cell', { name: mocks.testFranchiseName }) ).toBeVisible();
+  }
+  await createFranchise();
 
   // create a  store for the franchise
   await page.getByRole('link', { name: 'Franchise' }).click();
@@ -110,14 +113,16 @@ test( "create franchise and stores", async ( { page } ) => {
   // confirm stores are made
   await expect( page.getByRole('cell', { name: mocks.testStoreName }) ).toBeVisible()
   // close a store
-  // await page.getByRole('row', { name: `${mocks.testStoreName} 0 ₿ Close` }).getByRole('button').click();
-  // await page.getByRole('button', { name: 'Close' }).click();
+  await page.getByRole('button', { name: 'Close' }).nth(0).click();
+  await page.getByRole('button', { name: 'Close' }).click();
 
+  await createFranchise();
   // close the franchise
-  // await page.getByRole('link', { name: 'Admin' }).click();
-  // await expect(page.getByRole('button', {name: 'Close'}).nth(1)).toBeVisible();
-  // await page.getByRole('button', { name: 'Close' }).nth(1).click();
-  // await page.getByRole('button', { name: 'Close' }).click();
+  await expect(page.getByRole('cell', {name: mocks.testFranchiseName })).toBeVisible();
+  await page.getByRole('button', { name: 'Close' } ).nth(0).click();
+  const deletePromise = page.waitForResponse('**/*/api/franchise/1');
+  await page.getByRole('button', {name:'Close'}).click();
+  await deletePromise;
 
   await logout( page );
 });

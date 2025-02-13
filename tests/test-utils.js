@@ -114,6 +114,12 @@ async function mockFranchiseAPICall( currentPage ) {
         ];
         await route.fulfill({ json: responseBody });
       }
+      else if ( route.request().method() == 'DELETE' ) {
+          const responseBody = {
+            "message": "franchise deleted" // I made this up
+          };
+          await route.fulfill({ json: responseBody });
+      }
     } );
 
     await page.route( '*/**/api/franchise/1/store', async ( route ) => {
@@ -129,6 +135,15 @@ async function mockFranchiseAPICall( currentPage ) {
             "name": testStoreName
         }
 
+        await route.fulfill({ json: responseBody });
+      }
+    });
+
+    await page.route( '*/**/api/franchise/1/store/1', async ( route ) => {
+      if ( route.request().method() == 'DELETE' ) {
+        const responseBody = {
+          "message": "store deleted"
+        };
         await route.fulfill({ json: responseBody });
       }
     });
