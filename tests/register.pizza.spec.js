@@ -1,14 +1,11 @@
 import { test, expect } from 'playwright-test-coverage';
-import { mockMenuGet, mockFranchiseGet, mockOrderPost } from './test-utils';
-
-function randomName() {
-    return Math.random().toString(36).substring(2, 12);
-}
+import * as mocks from './test-utils';
 
 test( "register and order", async ( { page } ) => {  
-  await mockMenuGet( page );
-  await mockFranchiseGet( page );
-  await mockOrderPost( page );
+  await mocks.mockMenuGet( page );
+  await mocks.mockFranchiseAPICall( page );
+  await mocks.mockOrderAPICall( page );
+  await mocks.mockAuthAPICall( page );
   await page.goto('/');
 
   // Register and place an order
@@ -16,11 +13,11 @@ test( "register and order", async ( { page } ) => {
   await expect(page.getByRole('link').getByText('Login')).toBeVisible();
   await page.getByRole('link', { name: 'Register' }).click();
   await page.getByRole('textbox', { name: 'Full name' }).click();
-  await page.getByRole('textbox', { name: 'Full name' }).fill(randomName());
+  await page.getByRole('textbox', { name: 'Full name' }).fill( mocks.testUserName );
   await page.getByRole('textbox', { name: 'Full name' }).press('Tab');
-  await page.getByRole('textbox', { name: 'Email address' }).fill('rand@jwt.com');
+  await page.getByRole('textbox', { name: 'Email address' }).fill( mocks.testEmail );
   await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
-  await page.getByRole('textbox', { name: 'Password' }).fill(randomName());
+  await page.getByRole('textbox', { name: 'Password' }).fill( mocks.testPassword );
 
   const registerPromise = page.waitForResponse('**/*/api/auth');
   await page.getByRole('button', { name: 'Register' }).click();
