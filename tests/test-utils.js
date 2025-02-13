@@ -3,6 +3,8 @@ import { expect } from 'playwright-test-coverage';
 const testUserName = "TestUser";
 const testEmail = "test@jwt.com";
 const testPassword = "TestPassword";
+const testFranchiseName = "TestFranchiseName";
+const testStoreName = "TestStoreName";
 
 async function mockMenuGet( currentPage ) {
     /** @type {import('@playwright/test').Page} */
@@ -52,37 +54,71 @@ async function mockMenuGet( currentPage ) {
     });
 }
 
+async function mockSpecificFranchiseCall( currentPage ) {
+  /** @type {import('@playwright/test').Page} */
+  let page = currentPage;
+
+  await page.route( '*/**/api/franchise/1', async ( route ) => {
+    if ( route.request().method() == 'GET' ) {
+      const responseBody = [
+        {
+          "id": 1,
+          "name": testFranchiseName,
+          "admins": [
+            {
+              "id": 1,
+              "name": testUserName,
+              "email": testEmail
+            }
+          ],
+          "stores": [
+            {
+              "id": 1,
+              "name": testStoreName,
+              "email": testEmail
+            }
+          ]
+        }
+      ];
+      await route.fulfill({ json: responseBody });
+    }
+  } );
+}
 async function mockFranchiseAPICall( currentPage ) {
     /** @type {import('@playwright/test').Page} */
     let page = currentPage;
 
     await page.route('*/**/api/franchise', async ( route ) => {
-        if( route.request().method() == 'GET' ) {
-          const franchiseResponse = [
+      let responseBody;  
+      if( route.request().method() == 'GET' ) {
+          responseBody = [
             {
               "id": 1,
-              "name": "pizzaPocket",
+              "name": testFranchiseName,
               "stores": [
                 {
                   "id": 1,
-                  "name": "SLC"
-                }
-              ]
-            },
-            {
-              "id": 2,
-              "name": "Test Franchise",
-              "stores": [
-                {
-                    "id": 2,
-                    "name": "Test Store"
+                  "name": testStoreName
                 }
               ]
             }
           ];
-
-        await route.fulfill({ json: franchiseResponse })
         }
+        else if ( route.request().method() == 'POST' ) {
+          const requestBody = {
+            "stores": [],
+            "id": "",
+            "name": testFranchiseName,
+            "admins": [
+              {
+                "email": testEmail
+              }
+            ]
+          }
+          expect( route.request().postDataJSON() ).toMatchObject( requestBody );
+          responseBody = {}
+        }
+        await route.fulfill({ json: responseBody })
     } );
 }
 
@@ -231,6 +267,8 @@ export {
   testUserName,
   testEmail,
   testPassword,
+  testFranchiseName,
+  testStoreName,
   mockMenuGet,
   mockFranchiseAPICall,
   mockOrderAPICall,
