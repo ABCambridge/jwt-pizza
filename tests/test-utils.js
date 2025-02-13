@@ -54,36 +54,6 @@ async function mockMenuGet( currentPage ) {
     });
 }
 
-async function mockSpecificFranchiseCall( currentPage ) {
-  /** @type {import('@playwright/test').Page} */
-  let page = currentPage;
-
-  await page.route( '*/**/api/franchise/1', async ( route ) => {
-    if ( route.request().method() == 'GET' ) {
-      const responseBody = [
-        {
-          "id": 1,
-          "name": testFranchiseName,
-          "admins": [
-            {
-              "id": 1,
-              "name": testUserName,
-              "email": testEmail
-            }
-          ],
-          "stores": [
-            {
-              "id": 1,
-              "name": testStoreName,
-              "email": testEmail
-            }
-          ]
-        }
-      ];
-      await route.fulfill({ json: responseBody });
-    }
-  } );
-}
 async function mockFranchiseAPICall( currentPage ) {
     /** @type {import('@playwright/test').Page} */
     let page = currentPage;
@@ -107,7 +77,6 @@ async function mockFranchiseAPICall( currentPage ) {
         else if ( route.request().method() == 'POST' ) {
           const requestBody = {
             "stores": [],
-            "id": "",
             "name": testFranchiseName,
             "admins": [
               {
@@ -120,6 +89,49 @@ async function mockFranchiseAPICall( currentPage ) {
         }
         await route.fulfill({ json: responseBody })
     } );
+
+    await page.route( '*/**/api/franchise/1', async ( route ) => {
+      if ( route.request().method() == 'GET' ) {
+        const responseBody = [
+          {
+            "id": 1,
+            "name": testFranchiseName,
+            "admins": [
+              {
+                "id": 1,
+                "name": testUserName,
+                "email": testEmail
+              }
+            ],
+            "stores": [
+              {
+                "id": 1,
+                "name": testStoreName,
+                "email": testEmail
+              }
+            ]
+          }
+        ];
+        await route.fulfill({ json: responseBody });
+      }
+    } );
+
+    await page.route( '*/**/api/franchise/1/store', async ( route ) => {
+      if ( route.request().method() == 'POST' ) {
+        const requestBody = {
+          "id": "",
+          "name": testStoreName
+        }
+        expect( route.request().postDataJSON() ).toMatchObject( requestBody );
+        const responseBody = {
+            "id": 1,
+            "franchiseId": 1,
+            "name": testStoreName
+        }
+
+        await route.fulfill({ json: responseBody });
+      }
+    });
 }
 
 async function mockOrderVerificationAPICall( currentPage ) {
@@ -144,11 +156,6 @@ async function mockOrderVerificationAPICall( currentPage ) {
               {
                 "menuId": 2,
                 "description": "Pepperoni",
-                "price": 0.0042
-              },
-              {
-                "menuId": 3,
-                "description": "Margarita",
                 "price": 0.0042
               }
             ],
@@ -225,7 +232,7 @@ async function mockAuthAPICall( currentPage ) {
                   "role": "diner"
                 }
               ],
-              "id": 3
+              "id": 1
             },
             "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYnk1dXJqaTNoYyIsImVtYWlsIjoicmFuZEBqd3QuY29tIiwicm9sZXMiOlt7InJvbGUiOiJkaW5lciJ9XSwiaWQiOjkyLCJpYXQiOjE3Mzk0MDc2MTd9.4vTJOS-7eQaF4anv6Uu-7qqMv-jyI_AQlYH-sAeghgE"
           };
@@ -273,5 +280,5 @@ export {
   mockFranchiseAPICall,
   mockOrderAPICall,
   mockAuthAPICall,
-  mockOrderVerificationAPICall  
+  mockOrderVerificationAPICall
 };

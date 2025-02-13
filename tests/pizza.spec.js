@@ -56,6 +56,7 @@ test( "order pizza", async ( { page } ) => {
   await mocks.mockMenuGet( page );
   await mocks.mockOrderAPICall( page );
   await mocks.mockOrderVerificationAPICall( page );
+  await mocks.mockFranchiseAPICall( page );
   await login( page );
 
   // Order pizzas
@@ -90,7 +91,9 @@ test( "create franchise and stores", async ( { page } ) => {
   await page.getByRole('textbox', { name: 'franchise name' }).click();
   await page.getByRole('textbox', { name: 'franchise name' }).fill( mocks.testFranchiseName );
   await page.getByRole('textbox', { name: 'franchisee admin email' }).fill( mocks.testEmail );
+  const createFranchisePromise = page.waitForResponse('**/*/api/franchise');
   await page.getByRole('button', { name: 'Create' }).click();
+  await createFranchisePromise;
 
   // confirm franchise is made
   await expect( page.getByRole('cell', { name: mocks.testFranchiseName }) ).toBeVisible();
@@ -100,10 +103,12 @@ test( "create franchise and stores", async ( { page } ) => {
   await page.getByRole('button', { name: 'Create store' }).click();
   await page.getByRole('textbox', { name: 'store name' }).click();
   await page.getByRole('textbox', { name: 'store name' }).fill( mocks.testStoreName );
+  const creatStorePromise = page.waitForResponse('**/*/api/franchise/1/store');
   await page.getByRole('button', { name: 'Create' }).click();
+  await creatStorePromise;
 
   // confirm stores are made
-  // await expect( page.getByRole('cell', { name: mocks.testStoreName }) ).toBeVisible()
+  await expect( page.getByRole('cell', { name: mocks.testStoreName }) ).toBeVisible()
   // close a store
   // await page.getByRole('row', { name: `${mocks.testStoreName} 0 ₿ Close` }).getByRole('button').click();
   // await page.getByRole('button', { name: 'Close' }).click();
