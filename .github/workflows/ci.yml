@@ -49,29 +49,29 @@ jobs:
           echo "coverage is $coverage"
           curl -s -X POST "https://badge.cs329.click/badge/${{ github.repository_owner }}/jwtpizzacoverage?label=Coverage&value=$coverage%25&color=$color" -H "authorization: bearer ${{ secrets.FACTORY_API_KEY }}" -o /dev/null
 
-deploy:
-  needs: build
-  permissions:
-    id-token: write
-  runs-on: ubuntu-latest
-  env:
-    version: ${{needs.build.outputs.version}}
-  steps:
-    - name: Create OIDC token to AWS
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        audience: sts.amazonaws.com
-        aws-region: us-east-1
-        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.CI_IAM_ROLE }}
+  deploy:
+    needs: build
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    env:
+      version: ${{needs.build.outputs.version}}
+    steps:
+      - name: Create OIDC token to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.CI_IAM_ROLE }}
 
-    - name: Download dist artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: package
-        path: dist/
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: package
+          path: dist/
 
-    - name: Push to AWS S3
-      run: |
-        echo Deploying $version
-        aws s3 cp dist s3://${{ secrets.APP_BUCKET }} --recursive
-        aws cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths "/*"
+      - name: Push to AWS S3
+        run: |
+          echo Deploying $version
+          aws s3 cp dist s3://${{ secrets.APP_BUCKET }} --recursive
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths "/*"
