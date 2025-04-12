@@ -111,3 +111,14 @@ jobs:
             ${{ github.event.head_commit.message }}
 
             **commit**: ${{ github.sha }}
+
+  dastardly:
+    needs:
+      - build
+      - deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Dastardly Action Step
+        uses: PortSwigger/dastardly-github-action@main
+        with:
+          target-url: 'https://pizza.cambridgeuniverse.org'
