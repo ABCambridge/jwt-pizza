@@ -24,6 +24,7 @@ the entire OS including the kernel, it's just wrapping system calls to the kerne
 the native OS and the Docker container.  
     - When Windows added Windows Subsystem for Linux, Docker could start running natively on
     Windows  
+- It appears that MacOS still has to use the hypervisor to run a super light weight virtual machine.  
 
 ## Wait, so how does Windows Subsystem for Linux work??  
 - under the hood, "WSL 2 uses virtualization technology to run a Linux kernal inside of a lightweight
@@ -56,3 +57,9 @@ on WSL by [defining various configurations and packaging the distrubution as a t
 
 It turns out that you can run multiple Linux distributions on WSL at the same time, which has got to
 be pretty helpful for testing across various distributions.  
+
+## I thought MacOS used Linux or something like that. What does MacOS actually use?  
+- MacOS is built on Darwin and shares some Unix-like features with Linux, but is fundamentally
+NOT Linux.  
+- Both come from Unix, which is a much older operating system with many different operating systems built off of
+it sincei t came out in 1977. So macOS and Linux may feel similar on the surface, but are totally different operating systems.  
